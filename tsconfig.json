@@ -1,0 +1,14 @@
+{
+    "exclude": ["dist", "node_modules"],
+    "compilerOptions": {
+        "target": "ES2018",
+        "rootDir": "src",
+        "outDir": "dist",
+        "esModuleInterop": true,
+        "module": "commonjs",
+        "typeRoots": [
+            "node_modules/@types",
+            "@types"
+        ]
+    }
+}
