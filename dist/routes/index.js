@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const middlewares_1 = require("../middlewares");
+const auth_routes_1 = __importDefault(require("./auth.routes"));
+const category_routes_1 = __importDefault(require("./category.routes"));
+const currency_routes_1 = __importDefault(require("./currency.routes"));
+const wallet_routes_1 = __importDefault(require("./wallet.routes"));
+const router = (0, express_1.Router)();
+router.use(middlewares_1.requestLogger);
+router.use('/auth', auth_routes_1.default);
+router.use('/categories', category_routes_1.default);
+router.use('/currencies', currency_routes_1.default);
+router.use('/wallets', middlewares_1.authorization, wallet_routes_1.default);
+router.use(middlewares_1.errorLogger);
+router.use(middlewares_1.failSafehandler);
+exports.default = router;
