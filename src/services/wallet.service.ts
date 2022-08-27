@@ -1,23 +1,21 @@
-import { Wallet } from "@prisma/client"
 import { client } from "../config"
-import { WalletDetail } from "../model"
 
-async function create(userId: number, name: string, categoryId: number, currencyId: number) {
+async function create(userId: number, name: string, type: number, currency: number) {
     return client.wallet.create({
         data: {
             name,
             user: { 
                 connect: { id: userId } 
             },
-            category: {
-                connect: { id: categoryId }
+            type: {
+                connect: { id: type }
             },
             currency: {
-                connect: { id: currencyId }
+                connect: { id: currency }
             }
         },
         include: {
-            category: true,
+            type: true,
             currency: true
         }
     })
@@ -29,24 +27,24 @@ async function findAll(userId: number) {
             userId
         },
         include: {
-            category: true,
+            type: true,
             currency: true
         }
     })
 }
 
-async function update(id: number, name: string, categoryId: number, currencyId: number) {
+async function update(id: number, name: string, type: number, currency: number) {
     return client.wallet.update({
         where: {
             id
         },
         data: {
             name,
-            category: {
-                connect: { id: categoryId }
+            type: {
+                connect: { id: type }
             },
             currency: {
-                connect: { id: currencyId }
+                connect: { id: currency }
             }
         },
         include: {
@@ -76,49 +74,10 @@ async function checkOwnership(userId: number, walletId: number) {
     return wallet != null
 }
 
-async function details(id: number): Promise<WalletDetail> {
-
-    const wallet = await client.wallet.findUnique({
-        where: {
-            id
-        },
-        include: {
-            category: true,
-            currency: true,
-            transactions: true
-        }
-    })
-
-    let balance = 0
-
-    for (const transaction of wallet.transactions) {
-
-        if (transaction.type == "INCOMING") {
-            balance += transaction.amount
-        }
-        else {
-            balance -= transaction.amount
-        }
-    }
-
-    return {
-        id: wallet.id,
-        name: wallet.name,
-        status: wallet.status,
-        category: wallet.category,
-        currency: wallet.currency,
-        transactions: wallet.transactions,
-        balance,
-        updatedAt: wallet.updatedAt,
-        createdAt: wallet.createdAt
-    }
-}
-
 export default {
     create,
     findAll,
     checkOwnership,
-    details,
     remove,
     update
 }
