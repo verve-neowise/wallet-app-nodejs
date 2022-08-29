@@ -4,6 +4,7 @@ import jwtService from "./jwt.service"
 import userService from "./user.service"
 import walletService from "./wallet.service"
 import transactionService from "./transaction.service"
+import walletTypeService from "./wallet-type.service"
 
 export {
     categoryService,
@@ -11,5 +12,6 @@ export {
     jwtService,
     userService,
     walletService,
+    walletTypeService,
     transactionService
 }

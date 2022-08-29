@@ -9,5 +9,5 @@ export function error(message: string) {
 }
 
 export function dateFromQuery(param?: string): Date | null {
-    return param ? moment(param, "YYYY-MM-DD").toDate() : null
+    return param ? moment(param, "YYYY-MM-DD").toDate() : undefined
 }

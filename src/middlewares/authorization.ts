@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import jwtService from "../services/jwt.service";
 import { error, info } from "../util";
 
-export default (requiredRoles?: Role[]) => {
+export default (...requiredRoles: Role[]) => {
 
     return (req: Request, res: Response, next: NextFunction) => {
 
@@ -25,7 +25,7 @@ export default (requiredRoles?: Role[]) => {
 
         info(`token is valid`);
 
-        if ( requiredRoles && !requiredRoles.includes(payload.role)) {
+        if ( requiredRoles.length != 0 && !requiredRoles.includes(payload.role)) {
             error(`user role does not match required role: user=${payload.role}, required=${requiredRoles}`);
             return res.status(401).send({ message: 'Access denied.' })
         }

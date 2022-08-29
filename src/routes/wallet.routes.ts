@@ -5,33 +5,28 @@ const router = Router()
 
 router.get('/', async (req, res, next) => {
     try {
+        console.log('prepare response');
         const { userId } = res.locals.payload
         const wallets = await walletService.findAll(userId)
 
+        console.log('Send response');
         res.json({
             message: 'All wallets',
             wallets
         })
     }
     catch (err) {
+        console.log('next t error');
         next(err)
     }
 })
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9378f385aa44426fa382ab310092b124a93e7552
 router.post('/', async (req, res, next) => {
     try {
         const { userId } = res.locals.payload
         const { name, type, currency } = req.body
-
-<<<<<<< HEAD
-        const wallet = await walletService.create(userId, name, currency, type)
-=======
+        
         const wallet = await walletService.create(userId, name, type, currency)
->>>>>>> 9378f385aa44426fa382ab310092b124a93e7552
 
         res.json({
             message: 'Wallet created.',
@@ -51,11 +46,7 @@ router.put('/:id', async (req, res, next) => {
         const ownership = await walletService.checkOwnership(userId, +req.params.id)
 
         if (ownership) {
-<<<<<<< HEAD
-            const wallet = await walletService.update(userId, name, currency, type)
-=======
             const wallet = await walletService.update(userId, name, type, currency)
->>>>>>> 9378f385aa44426fa382ab310092b124a93e7552
             res.json({
                 message: 'Wallet created.',
                 wallet

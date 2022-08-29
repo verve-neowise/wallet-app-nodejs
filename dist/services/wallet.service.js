@@ -1,23 +1,31 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("../config");
-async function create(userId, name, categoryId, currencyId) {
+async function create(userId, name, type, currency) {
     return config_1.client.wallet.create({
         data: {
             name,
             user: {
                 connect: { id: userId }
             },
-            category: {
-                connect: { id: categoryId }
+            type: {
+                connect: { id: type }
             },
             currency: {
-                connect: { id: currencyId }
-            }
+                connect: { id: currency }
+            },
         },
         include: {
-            category: true,
-            currency: true
+            type: true,
+            currency: {
+                select: {
+                    name: true,
+                    code: true,
+                    id: true,
+                    createdAt: false,
+                    updatedAt: false
+                }
+            }
         }
     });
 }
@@ -27,28 +35,90 @@ async function findAll(userId) {
             userId
         },
         include: {
-            category: true,
-            currency: true
+            type: true,
+            currency: {
+                select: {
+                    name: true,
+                    code: true,
+                    id: true,
+                    createdAt: false,
+                    updatedAt: false
+                }
+            }
         }
     });
 }
-async function update(id, name, categoryId, currencyId) {
+async function changeStatus(id, status) {
+    return config_1.client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            status
+        }
+    });
+}
+async function changePayment(id, oldAmount, newAmount) {
+    return config_1.client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            balance: {
+                decrement: oldAmount,
+                increment: newAmount
+            }
+        }
+    });
+}
+async function addPayment(id, amount) {
+    return config_1.client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            balance: {
+                increment: amount
+            }
+        }
+    });
+}
+async function removePayment(id, amount) {
+    config_1.client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            balance: {
+                decrement: amount
+            }
+        }
+    });
+}
+async function update(id, name, type, currency) {
     return config_1.client.wallet.update({
         where: {
             id
         },
         data: {
             name,
-            category: {
-                connect: { id: categoryId }
+            type: {
+                connect: { id: type }
             },
             currency: {
-                connect: { id: currencyId }
+                connect: { id: currency }
             }
         },
         include: {
-            category: true,
-            currency: true
+            currency: {
+                select: {
+                    name: true,
+                    code: true,
+                    id: true,
+                    createdAt: false,
+                    updatedAt: false
+                }
+            }
         }
     });
 }
@@ -68,43 +138,13 @@ async function checkOwnership(userId, walletId) {
     });
     return wallet != null;
 }
-async function details(id) {
-    const wallet = await config_1.client.wallet.findUnique({
-        where: {
-            id
-        },
-        include: {
-            category: true,
-            currency: true,
-            transactions: true
-        }
-    });
-    let balance = 0;
-    for (const transaction of wallet.transactions) {
-        if (transaction.type == "INCOMING") {
-            balance += transaction.amount;
-        }
-        else {
-            balance -= transaction.amount;
-        }
-    }
-    return {
-        id: wallet.id,
-        name: wallet.name,
-        status: wallet.status,
-        category: wallet.category,
-        currency: wallet.currency,
-        transactions: wallet.transactions,
-        balance,
-        updatedAt: wallet.updatedAt,
-        createdAt: wallet.createdAt
-    };
-}
 exports.default = {
     create,
     findAll,
+    addPayment,
+    removePayment,
+    changePayment,
     checkOwnership,
-    details,
     remove,
     update
 };

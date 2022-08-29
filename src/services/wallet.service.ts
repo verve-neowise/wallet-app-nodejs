@@ -1,3 +1,4 @@
+import { WalletStatus } from "@prisma/client"
 import { client } from "../config"
 
 
@@ -13,11 +14,19 @@ async function create(userId: number, name: string, type: number, currency: numb
             },
             currency: {
                 connect: { id: currency }
-            }
+            },
         },
         include: {
             type: true,
-            currency: true
+            currency: {
+                select: {
+                    name: true,
+                    code: true,
+                    id: true,
+                    createdAt: false,
+                    updatedAt: false
+                }
+            }
         }
     })
 }
@@ -29,11 +38,71 @@ async function findAll(userId: number) {
         },
         include: {
             type: true,
-            currency: true
+            currency: {
+                select: {
+                    name: true,
+                    code: true,
+                    id: true,
+                    createdAt: false,
+                    updatedAt: false
+                }
+            }
         }
     })
 }
 
+
+async function changeStatus(id: number, status: WalletStatus) {
+    return client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            status
+        }
+    })
+}
+
+async function changePayment(id: number, oldAmount: number, newAmount: number) {
+    return client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            balance: {
+                decrement: oldAmount,
+                increment: newAmount
+            }
+        }
+    })
+
+}
+
+async function addPayment(id: number, amount: number) {
+    return client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            balance: {
+                increment: amount
+            }
+        }
+    })
+}
+
+async function removePayment(id: number, amount: number) {
+    client.wallet.update({
+        where: {
+            id
+        },
+        data: {
+            balance: {
+                decrement: amount
+            }
+        }
+    })
+}
 
 async function update(id: number, name: string, type: number, currency: number) {
     return client.wallet.update({
@@ -50,7 +119,15 @@ async function update(id: number, name: string, type: number, currency: number) 
             }
         },
         include: {
-            currency: true
+            currency: {
+                select: {
+                    name: true,
+                    code: true,
+                    id: true,
+                    createdAt: false,
+                    updatedAt: false
+                }
+            }
         }
     })
 }
@@ -78,6 +155,9 @@ async function checkOwnership(userId: number, walletId: number) {
 export default {
     create,
     findAll,
+    addPayment,
+    removePayment,
+    changePayment,
     checkOwnership,
     remove,
     update

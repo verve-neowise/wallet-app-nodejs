@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt_service_1 = __importDefault(require("../services/jwt.service"));
 const util_1 = require("../util");
-exports.default = (requiredRoles) => {
+exports.default = (...requiredRoles) => {
     return (req, res, next) => {
         let token = req.header('Authorization');
         if (!token) {
@@ -19,7 +19,7 @@ exports.default = (requiredRoles) => {
             return res.status(401).send({ message: 'Token is not valid.' });
         }
         (0, util_1.info)(`token is valid`);
-        if (requiredRoles && !requiredRoles.includes(payload.role)) {
+        if (requiredRoles.length != 0 && !requiredRoles.includes(payload.role)) {
             (0, util_1.error)(`user role does not match required role: user=${payload.role}, required=${requiredRoles}`);
             return res.status(401).send({ message: 'Access denied.' });
         }
