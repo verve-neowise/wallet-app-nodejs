@@ -26,6 +26,9 @@ model Wallet {
   name   String
   balance Float @default(0)
 
+  type   WalletType @relation(fields: [typeId], references: [id])
+  typeId Int
+
   transactions Transaction[]
 
   user   User @relation(fields: [userId], references: [id])
@@ -33,9 +36,6 @@ model Wallet {
 
   currency   Currency @relation(fields: [currencyId], references: [id])
   currencyId Int
-
-  type   WalletType @relation(fields: [typeId], references: [id])
-  typeId Int
 
   status WalletStatus @default(ACTIVE)
 
@@ -48,22 +48,26 @@ model Transaction {
   amount  Float
   comment String
 
+  category Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
   type TransactionType
 
   wallet   Wallet @relation(fields: [walletId], references: [id])
   walletId Int
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
 model Category {
   id   Int    @id @default(autoincrement())
   name String
   code String
+  Transaction Transaction[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model Currency {
@@ -78,9 +82,9 @@ model Currency {
 }
 
 model WalletType {
-  id     Int      @id @default(autoincrement())
-  name   String
-  Wallet Wallet[]
+  id      Int      @id @default(autoincrement())
+  name    String
+  wallets Wallet[]
 }
 
 enum Role {
@@ -89,8 +93,8 @@ enum Role {
 }
 
 enum TransactionType {
-  INCOME
-  EXPENSE
+  INCOMING
+  EXPOSE
 }
 
 enum WalletStatus {

@@ -1,22 +1,23 @@
 import { client } from "../config"
 
-async function create(userId: number, name: string, currencyId: number, typeId: number) {
+
+async function create(userId: number, name: string, type: number, currency: number) {
     return client.wallet.create({
         data: {
             name,
             user: { 
                 connect: { id: userId } 
             },
-            currency: {
-                connect: { id: currencyId }
-            },
             type: {
-                connect: { id: typeId }
+                connect: { id: type }
+            },
+            currency: {
+                connect: { id: currency }
             }
         },
         include: {
-            currency: true,
-            type: true
+            type: true,
+            currency: true
         }
     })
 }
@@ -33,18 +34,19 @@ async function findAll(userId: number) {
     })
 }
 
-async function update(id: number, name: string, currencyId: number, typeId: number) {
+
+async function update(id: number, name: string, type: number, currency: number) {
     return client.wallet.update({
         where: {
             id
         },
         data: {
             name,
-            currency: {
-                connect: { id: currencyId }
-            },
             type: {
-                connect: { id: typeId }
+                connect: { id: type }
+            },
+            currency: {
+                connect: { id: currency }
             }
         },
         include: {
